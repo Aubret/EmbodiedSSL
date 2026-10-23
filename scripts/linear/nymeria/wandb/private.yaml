@@ -1,0 +1,5 @@
+enabled: True
+entity: aaubret
+project: "AASSL"
+group: "mocov3-rn50"
+job_type: "linear"

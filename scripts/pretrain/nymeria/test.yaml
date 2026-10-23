@@ -1,0 +1,89 @@
+defaults:
+  - _self_
+  - augmentations: symmetric.yaml
+  - wandb: test.yaml
+  - override hydra/hydra_logging: disabled
+  - override hydra/job_logging: disabled
+
+# disable hydra outputs
+hydra:
+  output_subdir: null
+  run:
+    dir: .
+
+name: "aamocov3-nymeria"
+method: "aamocov3"
+backbone:
+  name: "resnet18"
+method_kwargs:
+  proj_hidden_dim: 4096
+  proj_output_dim: 256
+  pred_hidden_dim: 4096
+  temperature: 0.2
+  aa_layers: 3
+  aa_layers_pred: 3
+  aa_hidden_dim: 4096
+  aa_weight: 1
+  aa_temperature: 0.2
+momentum:
+  base_tau: 0.996
+  final_tau: 0.996
+data:
+  dataset: nymeria
+  train_path: "/home/arthur/postdoc/datasets/nymeria/"
+  val_path: None
+  format: "h5"
+  num_workers: 4
+  dataset_kwargs:
+    gaze_size: 224
+    time_window: 5
+    center_crop: False #To compare gaze crop with a center crop with gaze size 540
+    resolution: 512
+    version: 3
+    fps: 5
+optimizer:
+  name: "lars"
+  batch_size: 32
+  lr: 1.6
+  classifier_lr: 3e-3
+  weight_decay: 1e-6
+  no_labels: True
+scheduler:
+  name: "warmup_cosine"
+  warmup_epochs: 1
+checkpoint:
+  enabled: False
+  dir: "/scratch_shared/aubret/trained_models2"
+  frequency: 1
+  keep_prev: False
+  save_last: True
+auto_resume:
+  enabled: True
+
+knn_clb:
+  enabled: False
+  verbose: True
+  dataset: imagenet_42
+  k:
+    - 10
+    - 20
+    - 50
+    - 100
+  perform_on_validation: True
+  val_path: /home/aubret/
+  train_path: /home/aubret/
+  format: h5
+  delay_epochs: 1
+  freq_epochs: 1
+
+# overwrite PL stuff
+max_epochs: 10
+devices: 1
+sync_batchnorm: False
+accelerator: "cpu"
+strategy: "ddp"
+precision: 16-mixed
+no_validation: True
+limit_val_batches: 0
+num_sanity_val_steps: 0
+log_every_n_steps: 50

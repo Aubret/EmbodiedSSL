@@ -1,0 +1,5 @@
+enabled: True
+entity: $PRIVATE
+project: "NewProject"
+group: "nymeria"
+job_type: "train"
